@@ -34,6 +34,7 @@
 #include "util/posix_logger.h"
 #include "util/string_util.h"
 #include "util/sync_point.h"
+#include <libpmem.h>
 
 namespace rocksdb {
 
@@ -506,9 +507,14 @@ Status PosixMmapFile::Msync() {
   size_t p2 = TruncateToPageBoundary(dst_ - base_ - 1);
   last_sync_ = dst_;
   TEST_KILL_RANDOM("PosixMmapFile::Msync:0", rocksdb_kill_odds);
+//#define USE_PMEM
+#ifdef USE_PMEM
+  pmem_persist(base_ + p1, p2 - p1 + page_size_);
+#else
   if (msync(base_ + p1, p2 - p1 + page_size_, MS_SYNC) < 0) {
     return IOError(filename_, errno);
   }
+#endif
   return Status::OK();
 }
 
