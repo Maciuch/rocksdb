@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <atomic>
 #include "rocksdb/env.h"
+#include <libpmem.h>
 
 // For non linux platform, the following macros are used only as place
 // holder.

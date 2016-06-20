@@ -506,9 +506,10 @@ Status PosixMmapFile::Msync() {
   size_t p2 = TruncateToPageBoundary(dst_ - base_ - 1);
   last_sync_ = dst_;
   TEST_KILL_RANDOM("PosixMmapFile::Msync:0", rocksdb_kill_odds);
-  if (msync(base_ + p1, p2 - p1 + page_size_, MS_SYNC) < 0) {
-    return IOError(filename_, errno);
-  }
+  pmem_persist(base_ + p1, p2 - p1 + page_size_);
+//  if (msync(base_ + p1, p2 - p1 + page_size_, MS_SYNC) < 0) {
+//    return IOError(filename_, errno);
+//  }
   return Status::OK();
 }
 
